@@ -101,7 +101,7 @@ def test_swiglu_epilogue_rejects_different_activation_sources():
 
 def test_sm90_mma_config_rejects_invalid_tile_m_for_atom_layout():
     config = Sm90MmaConfig(
-        tile_shape_mn=(96, 256),
+        tile_shape_mnk=(96, 256, 64),
         atom_layout_mn=(2, 1),
     )
 
@@ -110,6 +110,19 @@ def test_sm90_mma_config_rejects_invalid_tile_m_for_atom_layout():
     assert not result.ok
     assert "tile M" in result.reason
     assert "divisible by 128" in result.reason
+
+
+def test_sm90_mma_config_rejects_invalid_tile_k():
+    config = Sm90MmaConfig(
+        tile_shape_mnk=(128, 128, 40),
+        atom_layout_mn=(2, 1),
+    )
+
+    result = config.validate()
+
+    assert not result.ok
+    assert "tile K" in result.reason
+    assert "divisible by 16" in result.reason
 
 
 def test_gemm_accumulator_contract_accepts_gemm_backed_output_tile():

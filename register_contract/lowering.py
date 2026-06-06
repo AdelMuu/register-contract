@@ -140,17 +140,11 @@ def _validate_common_sm90_config(config: ComponentConfig) -> CheckResult:
         )
 
     mma_result = Sm90MmaConfig(
-        tile_shape_mn=config.tile_shape_mnk[:2],
+        tile_shape_mnk=config.tile_shape_mnk,
         atom_layout_mn=config.atom_layout_mn,
     ).validate()
     if not mma_result.ok:
         return mma_result
-
-    tile_k = config.tile_shape_mnk[2]
-    if tile_k % 16 != 0:
-        return CheckResult.fail(
-            f"invalid tile K: expected tile_shape_mnk[2] divisible by 16, got {tile_k}"
-        )
 
     tile_m, tile_n, _ = config.tile_shape_mnk
     epi_m, epi_n = config.epi_tile_mn

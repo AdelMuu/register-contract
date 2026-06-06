@@ -8,11 +8,11 @@ from register_contract.types import Location, Producer, RegisterRole, TileLayout
 
 @dataclass(frozen=True)
 class Sm90MmaConfig:
-    tile_shape_mn: Tuple[int, int]
+    tile_shape_mnk: Tuple[int, int, int]
     atom_layout_mn: Tuple[int, int]
 
     def validate(self) -> CheckResult:
-        tile_m, tile_n = self.tile_shape_mn
+        tile_m, tile_n, tile_k = self.tile_shape_mnk
         atom_m, atom_n = self.atom_layout_mn
 
         if atom_m not in (1, 2, 3):
@@ -38,6 +38,11 @@ class Sm90MmaConfig:
                 return CheckResult.fail(
                     f"invalid tile N: expected tile N divisible by {required_n}, got {tile_n}"
                 )
+
+        if tile_k % 16 != 0:
+            return CheckResult.fail(
+                f"invalid tile K: expected tile K divisible by 16, got {tile_k}"
+            )
 
         return CheckResult.pass_("SM90 MMA config is valid")
 
